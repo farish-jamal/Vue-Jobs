@@ -1,5 +1,26 @@
 <script setup>
 import JobCard from "@/components/JobCard.vue";
+import { ref, onMounted } from 'vue';
+
+const jobs = ref([]);
+
+const fetchJobs = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/admin/getjobs');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    jobs.value = data.jobs;
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+  }
+};
+
+onMounted(() => {
+  fetchJobs();
+});
+
 </script>
 
 <template>
@@ -9,37 +30,7 @@ import JobCard from "@/components/JobCard.vue";
         Browse Jobs
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Job Listing 1 -->
-        <JobCard
-          opportunity="Full-Time"
-          role="Senior Vue Developer"
-          description="
-                We are seeking a talented Front-End Developer to join our team
-                in Boston, MA. The ideal candidate will have strong skills in
-                HTML, CSS, and JavaScript..."
-          salary="80K "
-          location="Boston, MA"
-        />
-        <JobCard
-          opportunity="Full-Time"
-          role="Senior Vue Developer"
-          description="
-                We are seeking a talented Front-End Developer to join our team
-                in Boston, MA. The ideal candidate will have strong skills in
-                HTML, CSS, and JavaScript..."
-          salary="80K "
-          location="Boston, MA"
-        />
-        <JobCard
-          opportunity="Full-Time"
-          role="Senior Vue Developer"
-          description="
-                We are seeking a talented Front-End Developer to join our team
-                in Boston, MA. The ideal candidate will have strong skills in
-                HTML, CSS, and JavaScript..."
-          salary="80K "
-          location="Boston, MA"
-        />
+        <JobCard v-for="(job, index) in jobs.slice(0, 3)" :key="index" :job="job" />
       </div>
     </div>
   </section>
